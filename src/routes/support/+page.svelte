@@ -4,4 +4,4 @@
 	export let data: PageData;
 </script>
 
-hello
+<h1>Supoort</h1>
