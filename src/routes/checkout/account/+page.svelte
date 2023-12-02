@@ -4,4 +4,4 @@
 	export let data: PageData;
 </script>
 
-<h1>Cart</h1>
+<h1>Account</h1>
