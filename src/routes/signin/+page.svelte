@@ -6,7 +6,7 @@
 	import type Stripe from 'stripe';
 
 	//functionality
-	import { firebaseAuth, signOutUser, user } from '$lib/firebase';
+	import { firebaseAuth, signOutUser, user } from '$lib/functions/firebase';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import {

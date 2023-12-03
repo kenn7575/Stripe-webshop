@@ -3,25 +3,54 @@
 	export let data: PageData;
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-
+	import { messages } from '$lib/functions/messageManager';
 	import { AspectRatio } from '$lib/components/ui/aspect-ratio';
 	import type Stripe from 'stripe';
 
 	const products = data.products.data;
 	const prices = data.prices.data;
 
-	function findPrice(id: string | Stripe.Price | null | undefined): string {
+	function findPrice(id: string | Stripe.Price | null | undefined): number {
 		const res = prices.find((price) => price.id === id);
 		if (res && res.unit_amount) {
-			const stringNumber = (res.unit_amount / 100).toString();
-			return stringNumber.replace('.', ',');
+			return res.unit_amount / 100;
 		} else {
-			return 'not found';
+			return NaN;
 		}
+	}
+	import { cart } from '$lib/functions/shoppingCart';
+	function addItemToCart(product: Stripe.Product) {
+		cart.update((items) => {
+			//if item already exists in cart, increase quantity
+			const existingItem = items.find((item) => item.id === product.id);
+			if (existingItem) {
+				existingItem.quantity++;
+				return [...items];
+			}
+			//else add new item to cart
+			console.log(typeof findPrice(product.default_price));
+			return [
+				...items,
+				{
+					id: product.id,
+					name: product.name,
+					price: findPrice(product.default_price),
+					quantity: 1,
+					image: product.images[0]
+				}
+			];
+		});
+		messages.addMessage({
+			type: 'success',
+			title: 'Added to cart',
+			text: `${product.name} was added to your cart`,
+			timeout: 3000
+		});
+		localStorage.setItem('cart', JSON.stringify($cart));
 	}
 </script>
 
-<div class="flex w-full justify-center mt-4 px-4">
+<div class="flex w-full justify-center mt-4 px-4 xl:px-40">
 	<div class="grid g w-full gap-4">
 		{#each products as product}
 			<Card.Root class="">

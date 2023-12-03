@@ -1,21 +1,45 @@
 <script lang="ts">
 	import '../app.pcss';
+	import { cart } from '$lib/functions/shoppingCart';
+	import { messages } from '$lib/functions/messageManager';
+
 	import { ModeWatcher } from 'mode-watcher';
 	import { Button } from '$lib/components/ui/button';
-	import { Sun, Moon, GithubLogo, HamburgerMenu, Person } from 'radix-icons-svelte';
+	import {
+		Sun,
+		Moon,
+		GithubLogo,
+		HamburgerMenu,
+		Person,
+		Check,
+		ExclamationTriangle,
+		Cross2
+	} from 'radix-icons-svelte';
 	import { toggleMode } from 'mode-watcher';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import { Separator } from '$lib/components/ui/separator';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-
-	import { user, signOutUser } from '$lib/firebase';
+	import { page } from '$app/stores';
+	import { user, signOutUser } from '$lib/functions/firebase';
 	import * as Card from '$lib/components/ui/card';
+	import { onMount } from 'svelte';
+	import type { CartItem } from '$lib/types';
+	import * as Alert from '$lib/components/ui/alert';
 
-	function totalPrice(items: any[]) {
+	function totalPrice(items: CartItem[]) {
 		return Math.round(items.reduce((acc, item) => acc + item.price * item.quantity, 0) * 100) / 100;
 	}
 
-	let userLoggedIn = false;
+	if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+		onMount(() => {
+			const stringData = localStorage.getItem('cart') ?? '[]';
+			const items = JSON.parse(stringData) as CartItem[] | undefined;
+			if (items) {
+				$cart = items;
+			}
+		});
+	}
+
 	let card = {
 		items: [
 			{
@@ -39,6 +63,24 @@
 		]
 	};
 </script>
+
+<div class="fixed bottom-4 right-4 z-40">
+	{#if $cart.length > 0}
+		{#each $messages as message}
+			<Alert.Root>
+				{#if message.type === 'warning'}
+					<ExclamationTriangle class="w-6 h-6 !text-error" />
+				{:else if message.type === 'success'}
+					<Check class="w-6 h-6 !text-success" />
+				{:else}
+					<Cross2 class="w-6 h-6 !text-error" />
+				{/if}
+				<Alert.Title>{message.title}</Alert.Title>
+				<Alert.Description>{message.text}</Alert.Description>
+			</Alert.Root>
+		{/each}
+	{/if}
+</div>
 
 <ModeWatcher />
 <nav class="w-full sticky top-0 bg-background z-50">
@@ -138,26 +180,46 @@
 					<span class="sr-only">Cart</span>
 				</Button>
 
-				<div class="min-w-72 hidden group-hover:flex flex-col absolute right-0 transition-opacity">
-					<span class="bg-transparent w-full h-4" />
-					<Card.Root>
-						<Card.Header>
-							<Card.Title>Shopping cart</Card.Title>
-							<Card.Description>You have added {card.items.length} to the cart</Card.Description>
-						</Card.Header>
-						<Separator />
+				{#if $page.route.id !== '/checkout'}
+					<div
+						class="min-w-72 hidden group-hover:flex flex-col absolute right-0 transition-opacity"
+					>
+						<span class="bg-transparent w-full h-4" />
+						<Card.Root>
+							<Card.Header>
+								<Card.Title>Shopping cart</Card.Title>
+								<Card.Description>You have added {card.items.length} to the cart</Card.Description>
+							</Card.Header>
+							<Separator />
 
-						<Card.Content class=" mt-2">content</Card.Content>
-						<Separator />
-						<Card.Footer class="mt-2">
-							<div class="flex justify-between gap-2 w-full items-center">
-								<p><strong>{totalPrice(card.items)} DKK</strong></p>
+							<Card.Content class="mt-2">
+								{#if $cart.length === 0}
+									<Card.Description>Your cart is empty</Card.Description>
+								{:else}
+									<div class="flex flex-col gap-2">
+										{#each $cart as item}
+											<div class="flex justify-between items-center">
+												<img class="w-5 h-5" src={item.image} alt="" />
+												<p>{item.name}</p>
+												<p>{item.price} DKK</p>
+											</div>
+										{/each}
+									</div>
+								{/if}
+							</Card.Content>
+							{#if $cart.length > 0}
+								<Separator />
+								<Card.Footer class="mt-2">
+									<div class="flex justify-between gap-2 w-full items-center">
+										<p><strong>{totalPrice($cart)} DKK</strong></p>
 
-								<Button href="/checkout">Checkout</Button>
-							</div>
-						</Card.Footer>
-					</Card.Root>
-				</div>
+										<Button href="/checkout">Checkout</Button>
+									</div>
+								</Card.Footer>
+							{/if}
+						</Card.Root>
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>
