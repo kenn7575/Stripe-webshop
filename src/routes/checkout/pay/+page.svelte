@@ -22,7 +22,7 @@
 	});
 
 	async function createPaymentIntent() {
-		const response = await fetch('/api/payment-intent', {
+		const response = await fetch('/api/stripe/payment-intent', {
 			method: 'POST',
 			headers: {
 				'content-type': 'application/json'
@@ -55,7 +55,7 @@
 			processing = false;
 		} else {
 			// payment succeeded, redirect to "thank you" page
-			goto('/examples/payment-element/thanks');
+			goto('/thanks');
 		}
 	}
 </script>
