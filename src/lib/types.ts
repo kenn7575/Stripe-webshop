@@ -5,9 +5,20 @@ export interface CartItem {
 	name: string;
 	price: number;
 }
-export interface Message {
+export interface MessageNoId {
 	title: string;
 	text: string;
 	type: string;
 	timeout: number;
+}
+export interface Message extends MessageNoId {
+	id: number;
+}
+export interface UserData {
+	uid: string;
+	email: string;
+	name: string;
+	phoneNumber: string;
+	purchases: string[];
+	stripeCustomerId: string;
 }

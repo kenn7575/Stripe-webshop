@@ -1,6 +1,5 @@
 import { writable } from 'svelte/store';
-import type { Message } from '$lib/types';
-import type { Writable } from 'svelte/store';
+import type { Message, MessageNoId } from '$lib/types';
 
 // Custom store for managing toast messages
 function toastStore() {
@@ -8,7 +7,13 @@ function toastStore() {
 	const { subscribe, update } = writable<Message[]>([]);
 
 	// Function to add a new message to the store
-	const addMessage = (message: Message) => {
+	const addMessage = (messageNoId: MessageNoId) => {
+		// Generate a random ID
+		const id = Math.floor(Math.random() * 1000);
+
+		// Add the message to the store
+		const message = { ...messageNoId, id };
+
 		update((messages) => [...messages, message]);
 
 		// Automatically dismiss the message after the specified timeout

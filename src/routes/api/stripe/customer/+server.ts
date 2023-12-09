@@ -30,7 +30,8 @@ export const POST: RequestHandler = async ({ request }) => {
 				uid: user.uid,
 				email,
 				displayName: user.displayName,
-				phoneNumber: user.phoneNumber
+				phoneNumber: user.phoneNumber,
+				purchases: []
 			};
 
 			await userRef.set(data);
@@ -56,9 +57,9 @@ export const POST: RequestHandler = async ({ request }) => {
 			uid: user.uid,
 			email,
 			displayName: user.displayName,
-			phoneNumber: user.phoneNumber
+			phoneNumber: user.phoneNumber,
+			purchases: []
 		};
-
 		await userRef.set(data);
 		return json(customer);
 	}

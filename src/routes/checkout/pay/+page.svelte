@@ -4,8 +4,7 @@
 	import { loadStripe } from '@stripe/stripe-js';
 	import { PUBLIC_STRIPE_KEY } from '$env/static/public';
 	console.log(PUBLIC_STRIPE_KEY, '$env/static/public');
-
-	import { Elements, PaymentElement, LinkAuthenticationElement, Address } from 'svelte-stripe';
+	import { Elements, PaymentElement, LinkAuthenticationElement } from 'svelte-stripe';
 	import Button from '$lib/components/ui/button/button.svelte';
 
 	let stripe: any = null;
@@ -17,7 +16,6 @@
 	onMount(async () => {
 		stripe = await loadStripe(PUBLIC_STRIPE_KEY);
 
-		// create payment intent server side
 		clientSecret = await createPaymentIntent();
 	});
 
@@ -33,7 +31,6 @@
 
 		return clientSecret;
 	}
-
 	async function submit() {
 		// avoid processing duplicates
 		if (processing) return;
@@ -58,45 +55,65 @@
 			goto('/thanks');
 		}
 	}
+	let theme: string | null = null;
+	let variables: {};
+	onMount(() => {
+		//get theme from localstorage
+		theme = localStorage.getItem('mode');
+		if (theme == 'light') {
+			variables = {
+				colorPrimary: '#E11D48',
+				colorBackground: '#ffffff',
+				colorText: '#000000',
+				colorDanger: '#7F1D1D',
+				spacingUnit: '2px',
+				borderRadius: '4px'
+			};
+		} else {
+			variables = {
+				colorPrimary: '#E11D48',
+				colorBackground: '#27272A',
+				colorText: '#ffffff',
+				colorDanger: '#7F1D1D',
+				spacingUnit: '2px',
+				borderRadius: '4px'
+			};
+		}
+	});
 </script>
-
-<h1>Payment Element Example</h1>
-
-<nav>
-	<a href="https://github.com/joshnuss/svelte-stripe/tree/main/src/routes/examples/payment-element"
-		>View code</a
-	>
-</nav>
 
 {#if error}
 	<p class="error">{error.message} Please try again.</p>
 {/if}
+<main class="flex justify-center w-full py-32">
+	{#if clientSecret && theme}
+		<div class="w-[40rem] px-4">
+			<Elements
+				{stripe}
+				{clientSecret}
+				{variables}
+				labels="floating"
+				rules={{ '.Input': { border: 'solid 1px #0002' } }}
+				bind:elements
+			>
+				<form on:submit|preventDefault={submit}>
+					<LinkAuthenticationElement />
+					<PaymentElement />
 
-{#if clientSecret}
-	<Elements
-		{stripe}
-		{clientSecret}
-		theme="stripe"
-		labels="floating"
-		rules={{ '.Input': { border: 'solid 1px #0002' } }}
-		bind:elements
-	>
-		<form on:submit|preventDefault={submit}>
-			<LinkAuthenticationElement />
-			<PaymentElement />
-
-			<Button class="p-4" disabled={processing}>
-				{#if processing}
-					Processing...
-				{:else}
-					Pay
-				{/if}
-			</Button>
-		</form>
-	</Elements>
-{:else}
-	Loading...
-{/if}
+					<Button class="p-4 w-full mt-2" disabled={processing} on:click={submit}>
+						{#if processing}
+							Processing...
+						{:else}
+							Pay
+						{/if}
+					</Button>
+				</form>
+			</Elements>
+		</div>
+	{:else}
+		Loading...
+	{/if}
+</main>
 
 <style>
 	.error {

@@ -2,6 +2,8 @@
 	import * as Table from '$lib/components/ui/table';
 	import { cart } from '$lib/functions/shoppingCart';
 	import { Input } from '$lib/components/ui/input';
+	import { Button } from '$lib/components/ui/button';
+	import * as Tooltip from '$lib/components/ui/tooltip';
 
 	function removeItemFromCart(id: string) {
 		cart.update((items) => {
@@ -15,15 +17,15 @@
 	}
 </script>
 
-<div class="flex justify-center mt-8">
-	<Table.Root class="w-fit mx-auto">
+<div class="flex items-center mt-8 flex-col px-32">
+	<Table.Root class="w-full mx-auto">
 		<Table.Header>
 			<Table.Row>
-				<Table.Head class="w-56">Image</Table.Head>
-				<Table.Head class="w-56">Name</Table.Head>
-				<Table.Head class="w-56">Quantity</Table.Head>
-				<Table.Head class="w-56">Price</Table.Head>
-				<Table.Head class="text-right w-56">Total</Table.Head>
+				<Table.Head>Image</Table.Head>
+				<Table.Head>Name</Table.Head>
+				<Table.Head>Quantity</Table.Head>
+				<Table.Head>Price</Table.Head>
+				<Table.Head class="text-right">Total</Table.Head>
 			</Table.Row>
 		</Table.Header>
 		<Table.Body>
@@ -51,4 +53,15 @@
 			{/each}
 		</Table.Body>
 	</Table.Root>
+
+	<div class="w-full mt-16">
+		<div class="flex gap-2 w-full justify-between">
+			<Button variant="secondary" href="/">Keep shopping</Button>
+			{#if $cart.length > 0}
+				<Button href="/checkout/account">Next</Button>
+			{:else}
+				<Button disabled>Next</Button>
+			{/if}
+		</div>
+	</div>
 </div>

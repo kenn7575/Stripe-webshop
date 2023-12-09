@@ -9,6 +9,8 @@
 
 	const products = data.products.data;
 	const prices = data.prices.data;
+	console.log(products);
+	console.log(prices);
 
 	function findPrice(id: string | Stripe.Price | null | undefined): number {
 		const res = prices.find((price) => price.id === id);
@@ -18,8 +20,10 @@
 			return NaN;
 		}
 	}
+
 	import { cart } from '$lib/functions/shoppingCart';
-	function addItemToCart(product: Stripe.Product) {
+	async function addItemToCart(product: Stripe.Product) {
+		// update cart
 		cart.update((items) => {
 			//if item already exists in cart, increase quantity
 			const existingItem = items.find((item) => item.id === product.id);
@@ -40,13 +44,10 @@
 				}
 			];
 		});
-		messages.addMessage({
-			type: 'success',
-			title: 'Added to cart',
-			text: `${product.name} was added to your cart`,
-			timeout: 3000
-		});
-		localStorage.setItem('cart', JSON.stringify($cart));
+
+		// update localstorage
+
+		document.cookie = `cart=${JSON.stringify($cart)}; path=/; samesite=strict; secure=true`;
 	}
 </script>
 

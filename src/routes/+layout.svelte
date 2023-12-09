@@ -1,6 +1,15 @@
 <script lang="ts">
 	import '../app.pcss';
 	import { cart } from '$lib/functions/shoppingCart';
+	import type { LayoutData } from './$types';
+	export let data: LayoutData;
+	try {
+		const cartData = data.cart as CartItem[];
+		if (cartData) $cart = cartData;
+	} catch (error) {
+		console.log("Shopping cart doesn't exist");
+	}
+
 	import { messages } from '$lib/functions/messageManager';
 
 	import { ModeWatcher } from 'mode-watcher';
@@ -25,59 +34,32 @@
 	import { onMount } from 'svelte';
 	import type { CartItem } from '$lib/types';
 	import * as Alert from '$lib/components/ui/alert';
+	import { fly } from 'svelte/transition';
 
 	function totalPrice(items: CartItem[]) {
+		if (items.length === 0) return 0;
 		return Math.round(items.reduce((acc, item) => acc + item.price * item.quantity, 0) * 100) / 100;
 	}
 
-	if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-		onMount(() => {
-			const stringData = localStorage.getItem('cart') ?? '[]';
-			const items = JSON.parse(stringData) as CartItem[] | undefined;
-			if (items) {
-				$cart = items;
-			}
-		});
-	}
-
-	let card = {
-		items: [
-			{
-				id: 1,
-				name: 'Product 1',
-				price: 100.1,
-				quantity: 1
-			},
-			{
-				id: 2,
-				name: 'Product 2',
-				price: 200.95,
-				quantity: 1
-			},
-			{
-				id: 3,
-				name: 'Product 3',
-				price: 300.3,
-				quantity: 1
-			}
-		]
-	};
+	import { flip } from 'svelte/animate';
 </script>
 
 <div class="fixed bottom-4 right-4 z-40">
 	{#if $cart.length > 0}
-		{#each $messages as message}
-			<Alert.Root>
-				{#if message.type === 'warning'}
-					<ExclamationTriangle class="w-6 h-6 !text-error" />
-				{:else if message.type === 'success'}
-					<Check class="w-6 h-6 !text-success" />
-				{:else}
-					<Cross2 class="w-6 h-6 !text-error" />
-				{/if}
-				<Alert.Title>{message.title}</Alert.Title>
-				<Alert.Description>{message.text}</Alert.Description>
-			</Alert.Root>
+		{#each $messages as message (message.id)}
+			<div in:fly={{ y: 200, opacity: 0.5 }} class="transition-all duration-500" animate:flip>
+				<Alert.Root class="w-96">
+					{#if message.type === 'warning'}
+						<ExclamationTriangle class="w-6 h-6 !text-error" />
+					{:else if message.type === 'success'}
+						<Check class="w-6 h-6 !text-success" />
+					{:else}
+						<Cross2 class="w-6 h-6 !text-error" />
+					{/if}
+					<Alert.Title>{message.title}</Alert.Title>
+					<Alert.Description>{message.text}</Alert.Description>
+				</Alert.Root>
+			</div>
 		{/each}
 	{/if}
 </div>
@@ -181,14 +163,12 @@
 				</Button>
 
 				{#if $page.route.id !== '/checkout'}
-					<div
-						class="min-w-72 hidden group-hover:flex flex-col absolute right-0 transition-opacity"
-					>
+					<div class="w-96 hidden group-hover:flex flex-col absolute right-0 transition-opacity">
 						<span class="bg-transparent w-full h-4" />
 						<Card.Root>
 							<Card.Header>
 								<Card.Title>Shopping cart</Card.Title>
-								<Card.Description>You have added {card.items.length} to the cart</Card.Description>
+								<Card.Description>You have added {$cart.length} to the cart</Card.Description>
 							</Card.Header>
 							<Separator />
 
@@ -198,10 +178,10 @@
 								{:else}
 									<div class="flex flex-col gap-2">
 										{#each $cart as item}
-											<div class="flex justify-between items-center">
+											<div class="flex justify-between items-center gap-2">
 												<img class="w-5 h-5" src={item.image} alt="" />
-												<p>{item.name}</p>
-												<p>{item.price} DKK</p>
+												<p class="text-start w-full">{item.name}</p>
+												<p>{item.price},-</p>
 											</div>
 										{/each}
 									</div>
