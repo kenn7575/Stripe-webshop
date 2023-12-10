@@ -38,7 +38,7 @@
 
 	function totalPrice(items: CartItem[]) {
 		if (items.length === 0) return 0;
-		return Math.round(items.reduce((acc, item) => acc + item.price * item.quantity, 0) * 100) / 100;
+		return Math.round(items.reduce((acc, item) => acc + item.price, 0) * 100) / 100;
 	}
 
 	import { flip } from 'svelte/animate';
@@ -179,8 +179,8 @@
 									<div class="flex flex-col gap-2">
 										{#each $cart as item}
 											<div class="flex justify-between items-center gap-2">
-												<img class="w-5 h-5" src={item.image} alt="" />
-												<p class="text-start w-full">{item.name}</p>
+												<img class="w-5 h-5" src={item.image_small} alt="" />
+												<p class="text-start w-full">{item.title}</p>
 												<p>{item.price},-</p>
 											</div>
 										{/each}

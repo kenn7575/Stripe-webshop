@@ -1,53 +1,50 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	export let data: PageData;
+	console.log(data);
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { messages } from '$lib/functions/messageManager';
 	import { AspectRatio } from '$lib/components/ui/aspect-ratio';
-	import type Stripe from 'stripe';
 
-	const products = data.products.data;
-	const prices = data.prices.data;
-	console.log(products);
-	console.log(prices);
-
-	function findPrice(id: string | Stripe.Price | null | undefined): number {
-		const res = prices.find((price) => price.id === id);
-		if (res && res.unit_amount) {
-			return res.unit_amount / 100;
-		} else {
-			return NaN;
-		}
-	}
+	let products = data.products as CartItem[];
 
 	import { cart } from '$lib/functions/shoppingCart';
-	async function addItemToCart(product: Stripe.Product) {
+	$: console.log($cart);
+
+	import type { CartItem } from '$lib/types';
+	async function addItemToCart(product: CartItem) {
 		// update cart
 		cart.update((items) => {
 			//if item already exists in cart, increase quantity
 			const existingItem = items.find((item) => item.id === product.id);
 			if (existingItem) {
-				existingItem.quantity++;
 				return [...items];
 			}
 			//else add new item to cart
-			console.log(typeof findPrice(product.default_price));
 			return [
 				...items,
 				{
 					id: product.id,
-					name: product.name,
-					price: findPrice(product.default_price),
-					quantity: 1,
-					image: product.images[0]
+					title: product.title,
+					price: product.price,
+					image: product.image,
+					image_small: product.image_small
 				}
 			];
 		});
 
 		// update localstorage
+		//make a list of item ids
+		const ids = $cart.map((item) => item.id);
 
-		document.cookie = `cart=${JSON.stringify($cart)}; path=/; samesite=strict; secure=true`;
+		document.cookie = `cart=${JSON.stringify(ids)}; path=/; samesite=strict; secure=true`;
+		messages.addMessage({
+			title: 'Item added to cart',
+			text: 'you can now go to the checkout page to complete your order',
+			type: 'success',
+			timeout: 4000
+		});
 	}
 </script>
 
@@ -56,20 +53,20 @@
 		{#each products as product}
 			<Card.Root class="">
 				<Card.Header>
-					<Card.Title>{product.name}</Card.Title>
+					<Card.Title>{product.title}</Card.Title>
 					<Card.Description>{product.description}</Card.Description>
 				</Card.Header>
 				<Card.Content>
 					<AspectRatio ratio={1 / 1} class="bg-muted">
 						<img
-							src={product.images[0]}
-							alt={product.name}
+							src={product.image}
+							alt={product.title}
 							class="rounded-md object-contain h-full w-full"
 						/>
 					</AspectRatio>
 				</Card.Content>
 				<Card.Footer class="flex justify-between">
-					<p><strong>{findPrice(product.default_price)} DKK</strong></p>
+					<p><strong>{product.price} DKK</strong></p>
 					<Button
 						on:click={() => {
 							addItemToCart(product);

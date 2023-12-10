@@ -229,6 +229,11 @@
 							<Label for="password">Password</Label>
 							<Input autocomplete="on" bind:value={password} id="password-signin" type="password" />
 						</div>
+						<Button
+							href="/signin/forgotten-password"
+							variant="link"
+							class="text-foreground/60 underline">I forgot my password</Button
+						>
 					</Card.Content>
 					<Card.Footer>
 						<Button on:click={passwordSignin} class="w-full">Sign in</Button>

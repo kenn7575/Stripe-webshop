@@ -23,7 +23,7 @@
 			<Table.Row>
 				<Table.Head>Image</Table.Head>
 				<Table.Head>Name</Table.Head>
-				<Table.Head>Quantity</Table.Head>
+
 				<Table.Head>Price</Table.Head>
 				<Table.Head class="text-right">Total</Table.Head>
 			</Table.Row>
@@ -32,23 +32,12 @@
 			{#each $cart as item, i (i)}
 				<Table.Row>
 					<Table.Cell>
-						<img src={item.image} alt={item.name} class="w-10 h-10" />
+						<img src={item.image_small} alt={item.title} class="w-10 h-10" />
 					</Table.Cell>
-					<Table.Cell>{item.name}</Table.Cell>
-					<Table.Cell class="font-medium">
-						<Input
-							on:change={() => {
-								if (item.quantity <= 0) {
-									removeItemFromCart(item.id);
-								}
-							}}
-							bind:value={item.quantity}
-							type="number"
-							class="w-32"
-						/>
-					</Table.Cell>
+					<Table.Cell>{item.title}</Table.Cell>
+
 					<Table.Cell>{item.price} Kr</Table.Cell>
-					<Table.Cell class="text-right">{item.price * item.quantity} Kr</Table.Cell>
+					<Table.Cell class="text-right">{item.price} Kr</Table.Cell>
 				</Table.Row>
 			{/each}
 		</Table.Body>

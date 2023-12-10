@@ -56,7 +56,7 @@
 		<Card.Footer class="flex gap-2 justify-between">
 			{#if $user}
 				<Button variant="secondary" on:click={changeUser}>Change account</Button>
-				<Button disabled={!$user}>
+				<Button href="/checkout/pay">
 					Go to checkout
 					<ArrowRight class="h-4 w-4 ml-2" />
 				</Button>

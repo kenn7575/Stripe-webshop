@@ -1,11 +1,13 @@
 import type { PageServerLoad } from './$types';
-import Stripe from 'stripe';
-import { SECRET_STRIPE_KEY } from '$env/static/private';
+import { adminDB } from '$lib/server/admin';
 
 export const load = (async () => {
-	const stripe = new Stripe(SECRET_STRIPE_KEY);
-	const products = await stripe.products.list();
-	const prices = await stripe.prices.list();
+	const colRef = await adminDB.collection('products').get();
+	const products = colRef.docs.map((doc) => doc.data());
+	//get ids and add to products
+	products.forEach((product, index) => {
+		product.id = colRef.docs[index].id;
+	});
 
-	return { products, prices };
+	return { products };
 }) satisfies PageServerLoad;

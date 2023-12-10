@@ -3,9 +3,10 @@
 	import { onMount } from 'svelte';
 	import { loadStripe } from '@stripe/stripe-js';
 	import { PUBLIC_STRIPE_KEY } from '$env/static/public';
-	console.log(PUBLIC_STRIPE_KEY, '$env/static/public');
 	import { Elements, PaymentElement, LinkAuthenticationElement } from 'svelte-stripe';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import Climate from '$lib/img/StripeClimateBadge.svg';
+	import type Stripe from 'stripe';
 
 	let stripe: any = null;
 	let clientSecret: any = null;
@@ -15,8 +16,25 @@
 
 	onMount(async () => {
 		stripe = await loadStripe(PUBLIC_STRIPE_KEY);
-
 		clientSecret = await createPaymentIntent();
+
+		//get theme from localstorage
+		theme = localStorage.getItem('mode');
+		if (theme == 'light') {
+			variables = {
+				colorPrimary: '#E11D48',
+				colorBackground: '#ffffff',
+				colorText: '#000000',
+				colorDanger: '#7F1D1D'
+			};
+		} else {
+			variables = {
+				colorPrimary: '#E11D48',
+				colorBackground: '#27272A',
+				colorText: '#ffffff',
+				colorDanger: '#7F1D1D'
+			};
+		}
 	});
 
 	async function createPaymentIntent() {
@@ -27,14 +45,13 @@
 			},
 			body: JSON.stringify({})
 		});
-		const { clientSecret } = await response.json();
-
-		return clientSecret;
+		const { paymentIntent } = await response.json();
+		console.log(paymentIntent);
+		// return paymentIntent.client_secret;
 	}
 	async function submit() {
 		// avoid processing duplicates
 		if (processing) return;
-
 		processing = true;
 
 		// confirm payment with stripe
@@ -42,60 +59,25 @@
 			elements,
 			redirect: 'if_required'
 		});
-
-		// log results, for debugging
-		console.log({ result });
-
 		if (result.error) {
 			// payment failed, notify user
 			error = result.error;
 			processing = false;
 		} else {
-			// payment succeeded, redirect to "thank you" page
 			goto('/thanks');
 		}
 	}
 	let theme: string | null = null;
 	let variables: {};
-	onMount(() => {
-		//get theme from localstorage
-		theme = localStorage.getItem('mode');
-		if (theme == 'light') {
-			variables = {
-				colorPrimary: '#E11D48',
-				colorBackground: '#ffffff',
-				colorText: '#000000',
-				colorDanger: '#7F1D1D',
-				spacingUnit: '2px',
-				borderRadius: '4px'
-			};
-		} else {
-			variables = {
-				colorPrimary: '#E11D48',
-				colorBackground: '#27272A',
-				colorText: '#ffffff',
-				colorDanger: '#7F1D1D',
-				spacingUnit: '2px',
-				borderRadius: '4px'
-			};
-		}
-	});
 </script>
 
 {#if error}
 	<p class="error">{error.message} Please try again.</p>
 {/if}
 <main class="flex justify-center w-full py-32">
-	{#if clientSecret && theme}
+	{#if clientSecret}
 		<div class="w-[40rem] px-4">
-			<Elements
-				{stripe}
-				{clientSecret}
-				{variables}
-				labels="floating"
-				rules={{ '.Input': { border: 'solid 1px #0002' } }}
-				bind:elements
-			>
+			<Elements {stripe} {clientSecret} {variables} labels="floating" bind:elements>
 				<form on:submit|preventDefault={submit}>
 					<LinkAuthenticationElement />
 					<PaymentElement />
@@ -109,6 +91,14 @@
 					</Button>
 				</form>
 			</Elements>
+			<div class="flex gap-8 mt-8">
+				<img src={Climate} alt="Stripe climate logo" height="50" width="50" />
+				<div class="⚙ as9d ⚙tccuz8">
+					<span class="text-foreground/60"
+						>We'll contribute <b>1.5% of your purchase</b> to remove CO₂ from the atmosphere.</span
+					>
+				</div>
+			</div>
 		</div>
 	{:else}
 		Loading...

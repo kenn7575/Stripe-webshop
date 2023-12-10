@@ -1,8 +1,8 @@
 export interface CartItem {
 	id: string;
-	quantity: number;
 	image: string;
-	name: string;
+	image_small: string;
+	title: string;
 	price: number;
 }
 export interface MessageNoId {
