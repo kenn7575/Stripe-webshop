@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	export let data: PageData;
-	console.log(data);
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { messages } from '$lib/functions/messageManager';
@@ -10,7 +9,6 @@
 	let products = data.products as CartItem[];
 
 	import { cart } from '$lib/functions/shoppingCart';
-	$: console.log($cart);
 
 	import type { CartItem } from '$lib/types';
 	async function addItemToCart(product: CartItem) {

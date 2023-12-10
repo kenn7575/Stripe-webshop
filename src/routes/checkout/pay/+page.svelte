@@ -7,12 +7,14 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Climate from '$lib/img/StripeClimateBadge.svg';
 	import type Stripe from 'stripe';
+	import { cart } from '$lib/functions/shoppingCart';
 
 	let stripe: any = null;
 	let clientSecret: any = null;
 	let error: any = null;
 	let elements: any;
 	let processing = false;
+	let amount = 0;
 
 	onMount(async () => {
 		stripe = await loadStripe(PUBLIC_STRIPE_KEY);
@@ -45,9 +47,14 @@
 			},
 			body: JSON.stringify({})
 		});
-		const { paymentIntent } = await response.json();
-		console.log(paymentIntent);
-		// return paymentIntent.client_secret;
+		if (!response.ok) {
+			error = await response.json();
+			return;
+		} else {
+			const paymentIntent = (await response.json()) as Stripe.PaymentIntent;
+			amount = paymentIntent.amount;
+			return paymentIntent.client_secret;
+		}
 	}
 	async function submit() {
 		// avoid processing duplicates
@@ -64,6 +71,9 @@
 			error = result.error;
 			processing = false;
 		} else {
+			//delete cart
+			document.cookie = `cart=; path=/; samesite=strict; secure=true; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+			$cart = [];
 			goto('/thanks');
 		}
 	}
@@ -95,11 +105,13 @@
 				<img src={Climate} alt="Stripe climate logo" height="50" width="50" />
 				<div class="⚙ as9d ⚙tccuz8">
 					<span class="text-foreground/60"
-						>We'll contribute <b>1.5% of your purchase</b> to remove CO₂ from the atmosphere.</span
+						>We'll contribute <b>90% of your purchase</b> to remove CO₂ from the atmosphere.</span
 					>
 				</div>
 			</div>
 		</div>
+	{:else if error}
+		<Button variant="secondary">Retry</Button>
 	{:else}
 		Loading...
 	{/if}

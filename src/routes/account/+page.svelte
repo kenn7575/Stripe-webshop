@@ -3,7 +3,7 @@
 
 	export let data: PageData;
 	import { user } from '$lib/functions/firebase';
+	console.log(data);
 </script>
 
 <h1>Hello user</h1>
-{JSON.stringify($user)}

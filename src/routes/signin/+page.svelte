@@ -20,17 +20,19 @@
 
 	//ui
 	import { GithubLogo } from 'radix-icons-svelte';
-	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
 	import * as Tabs from '$lib/components/ui/tabs';
-	import type { Http2ServerResponse } from 'http2';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import { Button } from '$lib/components/ui/button';
+	import { Checkbox } from '$lib/components/ui/checkbox';
 
 	//state
 	let email = '';
 	let password = '';
 	let errorMessage = '';
+	let exeptTerms = false;
 
 	//logic
 	async function authenticateIdToken(userCredential: UserCredential | void) {
@@ -175,7 +177,116 @@
 						</div>
 					</Card.Content>
 					<Card.Footer>
-						<Button on:click={passwordSignup} class="w-full">Create account</Button>
+						<div class="flex flex-col">
+							<div class="flex">
+								<div class="flex items-center space-x-2">
+									<Checkbox id="terms" bind:checked={exeptTerms} />
+									<Label
+										for="terms"
+										class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+									>
+										Accept terms and conditions
+									</Label>
+								</div>
+								<Dialog.Root>
+									<Dialog.Trigger asChild let:builder>
+										<Button builders={[builder]} variant="link" class="text-foreground underline"
+											>Read more.</Button
+										>
+									</Dialog.Trigger>
+									<Dialog.Content class="">
+										<Dialog.Header>
+											<Dialog.Title>Tearms of conditions</Dialog.Title>
+											<Dialog.Description>
+												Welcome to webshop.kennik.dk! By creating an account, you acknowledge and
+												agree to the following:
+											</Dialog.Description>
+										</Dialog.Header>
+										<ul
+											class="list-none mt-8 max-h-96 overflow-y-auto
+										
+										"
+										>
+											<li>
+												<h2 class="font-bold text-lg mb-2">1. Data Collection and Usage:</h2>
+												<p class="ml-4">
+													In order to provide you with the best possible experience on
+													webshop.Kennik.dk, we collect and store personal information that you
+													voluntarily provide during the account creation process, and while
+													reacting with elements on the website.
+												</p>
+											</li>
+											<li class="mt-4">
+												<h2 class="font-bold text-lg mb-2">2. Types of Personal Information:</h2>
+												<p class="ml-4">
+													The personal information we collect may include, but is not limited to,
+													your name, email address, purchases, google and github user information,
+													and any other information necessary for the proper functioning of the
+													website.
+												</p>
+											</li>
+											<li class="mt-4">
+												<h2 class="font-bold text-lg mb-2">3. Purpose of Data Storage:</h2>
+												<p class="ml-4">
+													Your personal information is stored securly on Firebase and Stripe to
+													facilitate your access to webshop.Kennik.dk and its features, personalize
+													your experience, and communicate with you as necessary.
+												</p>
+											</li>
+											<li class="mt-4">
+												<h2 class="font-bold text-lg mb-2">4. Security Measures:</h2>
+												<p class="ml-4">
+													We take the security of your personal information seriously.
+													webshop.Kennik.dk employs industry-standard security measures to protect
+													your data from unauthorized access, disclosure, alteration, and
+													destruction.
+												</p>
+											</li>
+
+											<li class="mt-4">
+												<h2 class="font-bold text-lg mb-2">5. Third-Party Services:</h2>
+												<p class="ml-4">
+													webshop.Kennik.dk use third-party services for analytics and prosseccing
+													payments. These services may also collect and store your personal
+													information. Please review their privacy policies for more information.
+													third-partys include Firebase, Stripe, Google and vercel.
+												</p>
+											</li>
+											<li class="mt-4">
+												<h2 class="font-bold text-lg mb-2">6. Opt-Out Option:</h2>
+												<p class="ml-4">
+													You have the right to opt-out of certain data collection and storage by
+													adjusting your account settings. However, please note that this WILL
+													impact your ability to use certain features of webshop.Kennik.dk.
+													Furthermore, you will loose access to previous purchases.
+												</p>
+											</li>
+											<li class="mt-4">
+												<h2 class="font-bold text-lg mb-2">7. Data Retention:</h2>
+												<p class="ml-4">
+													We will retain your personal information for as long as necessary to
+													fulfill the purposes outlined in this consent statement or as required by
+													applicable laws and regulations. If you wish to delete your account, visit
+													the <a class="underline" href="/support">support page</a>.
+												</p>
+											</li>
+											<li class="mt-4">
+												<h2 class="font-bold text-lg mb-2">8. Changes to this Consent:</h2>
+												<p class="ml-4">
+													webshop.Kennik.dk reserves the right to update this user consent
+													statement. Any changes will be communicated to you through the email.
+												</p>
+											</li>
+										</ul>
+									</Dialog.Content>
+								</Dialog.Root>
+							</div>
+							{#if exeptTerms}
+								<Button on:click={passwordSignup} class="w-full mt-2">Create account</Button>
+							{:else}
+								<Button disabled class="w-full mt-2">Create account</Button>
+							{/if}
+						</div>
 					</Card.Footer>
 				</form>
 			</Card.Root>

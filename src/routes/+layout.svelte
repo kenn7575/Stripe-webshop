@@ -31,7 +31,6 @@
 	import { page } from '$app/stores';
 	import { user, signOutUser } from '$lib/functions/firebase';
 	import * as Card from '$lib/components/ui/card';
-	import { onMount } from 'svelte';
 	import type { CartItem } from '$lib/types';
 	import * as Alert from '$lib/components/ui/alert';
 	import { fly } from 'svelte/transition';
@@ -206,9 +205,3 @@
 	<Separator />
 </nav>
 <slot />
-
-<style>
-	.min-w-72 {
-		min-width: 18rem;
-	}
-</style>
