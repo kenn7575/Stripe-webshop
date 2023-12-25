@@ -21,7 +21,10 @@
 
 	function changeUser() {
 		signOutUser();
-		goto('/signin?redirect=/checkout/pay');
+		//wait 500 ms
+		setTimeout(() => {
+			goto('/signin?redirect=/checkout/pay');
+		}, 500);
 	}
 </script>
 

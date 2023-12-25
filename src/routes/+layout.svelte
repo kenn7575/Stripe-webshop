@@ -3,15 +3,11 @@
 	import { cart } from '$lib/functions/shoppingCart';
 	import type { LayoutData } from './$types';
 	export let data: LayoutData;
-	try {
-		const cartData = data.cart as CartItem[];
-		if (cartData) $cart = cartData;
-	} catch (error) {
-		console.log("Shopping cart doesn't exist");
-	}
+
+	const cartData = data.cart as CartItem[] | null;
+	if (cartData) $cart = cartData;
 
 	import { messages } from '$lib/functions/messageManager';
-
 	import { ModeWatcher } from 'mode-watcher';
 	import { Button } from '$lib/components/ui/button';
 	import {
@@ -24,6 +20,7 @@
 		ExclamationTriangle,
 		Cross2
 	} from 'radix-icons-svelte';
+	import * as Dialog from '$lib/components/ui/dialog';
 	import { toggleMode } from 'mode-watcher';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import { Separator } from '$lib/components/ui/separator';
@@ -34,6 +31,30 @@
 	import type { CartItem } from '$lib/types';
 	import * as Alert from '$lib/components/ui/alert';
 	import { fly } from 'svelte/transition';
+
+	import { beforeNavigate, afterNavigate } from '$app/navigation';
+
+	import gsap from 'gsap/dist/gsap';
+	import Flip from 'gsap/dist/Flip';
+
+	let state: any;
+
+	gsap.registerPlugin(Flip);
+	beforeNavigate(() => {
+		state = Flip.getState('.cover');
+	});
+
+	afterNavigate(() => {
+		if (state) {
+			Flip.from(state, {
+				duration: 0.5,
+				ease: 'easeInOut',
+				scale: true,
+				targets: '.cover',
+				simple: true
+			});
+		}
+	});
 
 	function totalPrice(items: CartItem[]) {
 		if (items.length === 0) return 0;
@@ -65,7 +86,7 @@
 
 <ModeWatcher />
 <nav class="w-full sticky top-0 bg-background z-50">
-	<div class="w-full p-4 flex justify-between">
+	<div class="w-full px-4 items-center flex justify-between h-16">
 		<Sheet.Root>
 			<Sheet.Trigger asChild let:builder>
 				<Button size="icon" builders={[builder]} variant="outline">

@@ -39,7 +39,13 @@ export const POST: RequestHandler = async ({ request }) => {
 		const purchaseRef = await userRef.collection('purchases');
 		const ids = JSON.parse(charge.metadata.cart ?? '[]') as string[];
 		ids.forEach(async (id) => {
-			await purchaseRef.add({ charge_id: charge.id, created: charge.created, products_id: id });
+			await purchaseRef.add({
+				charge_id: charge.id,
+				created: charge.created,
+				product_id: id,
+				amount: charge.amount,
+				currency: charge.currency
+			});
 		});
 	}
 

@@ -1,5 +1,5 @@
 import type { RequestHandler } from './$types';
-import { stripe, adminDB } from '$lib/server/admin';
+import { adminStripe, adminDB } from '$lib/server/admin';
 import type Stripe from 'stripe';
 import { json } from '@sveltejs/kit';
 import type { User } from 'firebase/auth';
@@ -17,7 +17,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const { stripeCustomerId } = userSnapshot.data() ?? {};
 		if (!stripeCustomerId) {
 			// ? user exists but missing stripeCustomerId
-			const customer = (await stripe.customers.create({
+			const customer = (await adminStripe.customers.create({
 				email,
 				metadata: {
 					firebaseUID: user.uid
@@ -38,11 +38,11 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json(customer);
 		} else {
 			// ? user exists and has stripeCustomerId
-			return json(await stripe.customers.retrieve(stripeCustomerId));
+			return json(await adminStripe.customers.retrieve(stripeCustomerId));
 		}
 	} else {
 		// ? user does not exist
-		const customer = (await stripe.customers.create({
+		const customer = (await adminStripe.customers.create({
 			email,
 			metadata: {
 				firebaseUID: user.uid

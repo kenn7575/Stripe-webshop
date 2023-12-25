@@ -105,13 +105,18 @@
 				<img src={Climate} alt="Stripe climate logo" height="50" width="50" />
 				<div class="⚙ as9d ⚙tccuz8">
 					<span class="text-foreground/60"
-						>We'll contribute <b>90% of your purchase</b> to remove CO₂ from the atmosphere.</span
+						>We'll contribute <b>50% of your purchase</b> to remove CO₂ from the atmosphere.</span
 					>
 				</div>
 			</div>
 		</div>
 	{:else if error}
-		<Button variant="secondary">Retry</Button>
+		<Button
+			variant="secondary"
+			on:click={() => {
+				location.reload();
+			}}>Retry</Button
+		>
 	{:else}
 		Loading...
 	{/if}
